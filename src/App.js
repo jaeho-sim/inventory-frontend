@@ -1,5 +1,7 @@
 import { initializeApp } from "firebase/app";
-import Auth from "./Auth";
+import { getAuth, signInWithPopup, signOut, GoogleAuthProvider } from 'firebase/auth';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import Inventory from './Inventory';
 import './App.scss';
 
 const firebaseConfig = {
@@ -12,12 +14,63 @@ const firebaseConfig = {
 };
 
 const firebaseApp = initializeApp(firebaseConfig);
+const auth = getAuth(firebaseApp);
+
+const Navbar = () => {
+  const [user, loading, error] = useAuthState(auth);
+
+  const login = () => {
+    signInWithPopup(auth, new GoogleAuthProvider())
+      .then((result) => {
+        // This gives you a Google Access Token. You can use it to access the Google API.
+        // const credential = GoogleAuthProvider.credentialFromResult(result);
+        // const token = credential.accessToken;
+        // The signed-in user info.
+        // const user = result.user;
+        // IdP data available using getAdditionalUserInfo(result)
+        // ...
+      }).catch((error) => {
+        // Handle Errors here.
+        // const errorCode = error.code;
+        // const errorMessage = error.message;
+        // The email of the user's account used.
+        // const email = error.customData.email;
+        // The AuthCredential type that was used.
+        // const credential = GoogleAuthProvider.credentialFromError(error);
+        console.log('error', error)
+        // ...
+      });
+  };
+  const logout = () => {
+    signOut(auth);
+  };
+
+  console.log('user', user)
+  return (
+    <div className="navbar">
+      <h3>Inventory App</h3>
+      <div className="navbar-auth">
+        { loading ?
+            <p>Loading...</p> :
+            error ?
+              <p>Error: {error}</p> :
+              user ?
+                <><button onClick={logout}>Log out</button><p>Logged in as <br /><b>{user.displayName}</b></p></> :
+                <button onClick={login}>Log in</button>
+        }
+      </div>
+      <hr />
+    </div>
+  );
+};
 
 function App() {
   return (
     <div className="App">
-      Initialized
-      <Auth app={{ firebaseApp }} />
+      <div className="App-page">
+          <Navbar />
+          <Inventory />
+      </div>
     </div>
   );
 }
