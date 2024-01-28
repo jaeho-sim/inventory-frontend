@@ -1,5 +1,6 @@
 import { initializeApp } from "firebase/app";
-import './App.css';
+import Auth from "./Auth";
+import './App.scss';
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -10,12 +11,13 @@ const firebaseConfig = {
   appId: process.env.REACT_APP_FIREBASE_APP_ID
 };
 
-initializeApp(firebaseConfig);
+const firebaseApp = initializeApp(firebaseConfig);
 
 function App() {
   return (
     <div className="App">
       Initialized
+      <Auth app={{ firebaseApp }} />
     </div>
   );
 }
