@@ -1,5 +1,5 @@
 Local running:
-- `npm run dev`
+- `npm start`
 - default port is 3000 (`http://localhost:3000`)
 - you should have `.env` set up with your firebase credentials in order to use the authentication.
   sample:
