@@ -1,7 +1,9 @@
+import { useContext } from 'react';
 import { initializeApp } from "firebase/app";
 import { getAuth, signInWithPopup, signOut, GoogleAuthProvider } from 'firebase/auth';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import Inventory from './Inventory';
+import { AuthContext } from './contexts';
 import './App.scss';
 
 const firebaseConfig = {
@@ -17,6 +19,29 @@ const firebaseApp = initializeApp(firebaseConfig);
 const auth = getAuth(firebaseApp);
 
 const Navbar = () => {
+  const authData = useContext(AuthContext);
+  const { user, loading, error, login, logout } = authData;
+
+  console.log('user', user)
+  return (
+    <div className="navbar">
+      <h3>Inventory App</h3>
+      <div className="navbar-auth">
+        { loading ?
+            <p>Loading...</p> :
+            error ?
+              <p>Error: {error}</p> :
+              user ?
+                <><button onClick={logout}>Log out</button><p>Logged in as <br /><b>{user.displayName}</b></p></> :
+                <button onClick={login}>Log in</button>
+        }
+      </div>
+      <hr />
+    </div>
+  );
+};
+
+function App() {
   const [user, loading, error] = useAuthState(auth);
 
   const login = () => {
@@ -45,33 +70,17 @@ const Navbar = () => {
     signOut(auth);
   };
 
-  console.log('user', user)
-  return (
-    <div className="navbar">
-      <h3>Inventory App</h3>
-      <div className="navbar-auth">
-        { loading ?
-            <p>Loading...</p> :
-            error ?
-              <p>Error: {error}</p> :
-              user ?
-                <><button onClick={logout}>Log out</button><p>Logged in as <br /><b>{user.displayName}</b></p></> :
-                <button onClick={login}>Log in</button>
-        }
-      </div>
-      <hr />
-    </div>
-  );
-};
+  const authData = { user, loading, error, login, logout };
 
-function App() {
   return (
-    <div className="App">
+    <AuthContext.Provider value={authData}>
+      <div className="App">
       <div className="App-page">
           <Navbar />
           <Inventory />
       </div>
     </div>
+    </AuthContext.Provider>
   );
 }
 
